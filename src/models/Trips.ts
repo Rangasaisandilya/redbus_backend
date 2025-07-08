@@ -30,16 +30,21 @@ const tripsSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending','approved', 'completed', 'cancelled'],
-        required: true,
-        default:'pending'
+        enum: ['pending', 'approved', 'completed', 'cancelled'],
+        default: 'pending'
     },
     price: {
         type: Number,
         required: true
+    },
+
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
 }, {
-    timestamps: true 
+    timestamps: true
 });
 
-export default mongoose.model('Trips',tripsSchema)
+export default mongoose.model('Trips', tripsSchema)

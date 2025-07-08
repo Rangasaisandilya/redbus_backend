@@ -27,10 +27,6 @@ export const tripValidator = [
     .notEmpty().withMessage('available_sleeper is required')
     .isInt({ min: 0 }).withMessage('available_sleeper must be a non-negative integer'),
 
-  body('status')
-    .notEmpty().withMessage('status is required')
-    .isIn(['scheduled', 'completed', 'cancelled']).withMessage('Invalid status'),
-
   body('price')
     .notEmpty().withMessage('price is required')
     .isFloat({ min: 0 }).withMessage('Price must be a non-negative number')

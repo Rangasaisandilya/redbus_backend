@@ -7,11 +7,23 @@ import catchAsync from "../utils/catchAsync";
 import Trips from "../models/Trips";
 import Routes from "../models/Routes";
 import Bus from "../models/Bus";
+import { ADMIN } from "../common/roles";
+
+interface UserRequest extends Request {
+    user?: UserPayload
+}
+
+
+interface UserPayload {
+    id?: string;
+    role?: string;
+    email?: string;
+}
 
 
 export const getAllTrips = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     console.log("get all schedules called")
-    const schedulesResponse = Trips.find();
+    const schedulesResponse = await Trips.find();
 
     if (!schedulesResponse) {
         throw new AppError(404, "No Trips data found")
@@ -23,23 +35,10 @@ export const getAllTrips = catchAsync(async (req: Request, res: Response, next: 
 
 })
 
-export const createNewTrip = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const createNewTrip = catchAsync(async (req: UserRequest, res: Response, next: NextFunction) => {
     console.log("create new trip api started")
 
-    const { routeId, busId, ...rest } = req.body
-    const errorResult = validationResult(req);
-
-    if (!errorResult.isEmpty()) {
-        const formattedErrors = errorResult.array().map(err => {
-            if ('param' in err) {
-                return `${err.param}: ${err.msg}`;
-            }
-            return `Unknown field: ${err.msg}`;
-        }).join(', ');
-
-        return next(new AppError(400, formattedErrors));
-    }
-
+    const { routeId, busId} = req.body
 
     if (!mongoose.Types.ObjectId.isValid(routeId) || !mongoose.Types.ObjectId.isValid(busId)) {
         throw new AppError(400, 'Invalid routeId or busId format')
@@ -52,6 +51,13 @@ export const createNewTrip = catchAsync(async (req: Request, res: Response, next
         throw new AppError(400, 'Route or Bus not found')
     }
 
+    if(req?.user?.role===ADMIN){
+        req.body.status="approved"
+    }
+
+    req.body.createdBy = req.body.userId
+    delete req.body.userId
+
 
     const createTripResponse = await Trips.create(req.body)
 
@@ -62,7 +68,7 @@ export const createNewTrip = catchAsync(async (req: Request, res: Response, next
 
 
 
-export const updateTrip = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const updateTrip = catchAsync(async (req: UserRequest, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const updateData = req.body;
 
