@@ -7,7 +7,8 @@ import mongoose from "mongoose";
 
 export const getAllRoutes = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     console.log("get all schedules called")
-    const schedulesResponse = Routes.find();
+    const schedulesResponse = await Routes.find();
+    console.log(schedulesResponse)
 
     if (!schedulesResponse) {
         throw new AppError(404, "No Routes data found")
@@ -44,7 +45,7 @@ export const updateRoute = catchAsync(async (req: Request, res: Response, next: 
         return next(new AppError(404, 'Route not found'));
     }
 
-    sendSuccessResponse(200,res,updateRoute,"Successfully update route")
+    sendSuccessResponse(200,res,updatedRoute,"Successfully update route")
 
 });
 

@@ -5,12 +5,14 @@ const routesSchema = new mongoose.Schema({
     from: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        lowercase:true
     },
     to: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        lowercase:true
     },
     estimatedDuration: {
         type: String,
