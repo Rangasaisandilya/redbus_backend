@@ -1,7 +1,8 @@
 import { handleValidationErrors } from './../middleware/handleValidationErrors';
 import { Router } from "express";
-import { getAllTrips,createNewTrip, updateTrip } from "../modules/tripsController";
+import { getAllTrips,createNewTrip, updateTrip } from "../controllers/tripsController";
 import { tripValidator } from "../validators/tripValidator";
+import { validateRequest } from '../middleware/validateRequest';
 
 const router= Router()
 
@@ -13,6 +14,6 @@ router.post("/trips",tripValidator,createNewTrip)
 
 //update existing trip
 
-router.put("/trips",tripValidator,updateTrip)
+router.put("/trips/:id",tripValidator,validateRequest,updateTrip)
 
 export default router
