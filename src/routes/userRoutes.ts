@@ -1,10 +1,11 @@
 import express from 'express';
-import { updateUserProfile } from '../controllers/userController';
+import { getAllUsers, updateUserProfile } from '../controllers/userController';
 import { authenticate } from '../middleware/auth';
 import { updateUserValidator } from '../middleware/validations/userValidation';
 import { validateRequest } from '../middleware/validateRequest';
 
 const router = express.Router();
+
 
 /**
  * @swagger
@@ -57,6 +58,7 @@ const router = express.Router();
  *       404:
  *         description: User not found
  */
+router.get('/', authenticate, getAllUsers);
 router.put('/:id', authenticate, updateUserValidator, validateRequest, updateUserProfile);
 
 export default router;
