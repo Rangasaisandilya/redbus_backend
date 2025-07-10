@@ -4,6 +4,7 @@ import {
     getAllBookings,
     getBookingById,
     getBookingsByTrip,
+    getBookingsByUser,
     getActiveBookings,
     updateBooking,
     cancelBooking,
@@ -32,8 +33,6 @@ const router = express.Router();
  *   post:
  *     summary: Create a new booking
  *     tags: [Booking]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -42,15 +41,17 @@ const router = express.Router();
  *             type: object
  *             required:
  *               - tripId
- *               - seatNumber
- *               - passenger
+ *               - seatNumbers
+ *               - passengers
  *               - totalAmount
  *             properties:
  *               tripId:
  *                 type: string
- *               seatNumber:
- *                 type: string
- *               passenger:
+ *               seatNumbers:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               passengers:
  *                 type: array
  *                 items:
  *                   type: object
@@ -59,8 +60,8 @@ const router = express.Router();
  *     responses:
  *       201:
  *         description: Booking created successfully
- *       401:
- *         description: Unauthorized
+ *       400:
+ *         description: Bad request
  *   get:
  *     summary: Get all bookings
  *     tags: [Booking]
@@ -185,13 +186,32 @@ const router = express.Router();
  *         description: Booking cannot be cancelled
  *       404:
  *         description: Booking not found
+ * 
+ * /api/v1/booking/user/{userId}:
+ *   get:
+ *     summary: Get bookings by user ID
+ *     tags: [Booking]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of bookings for user
+ *       401:
+ *         description: Unauthorized
  */
 
-router.post('/', authenticate, bookingValidator, validateRequest, createBooking);
+router.post('/', bookingValidator, validateRequest, createBooking);
 router.get('/', authenticate, getAllBookings);
 router.get('/active', authenticate, getActiveBookings);
 router.get('/trip/:tripId', authenticate, getBookingsByTrip);
-router.get('/:id', authenticate, getBookingById);
+router.get('/user/:userId', authenticate, getBookingsByUser);
+router.get('/:id', getBookingById);
 router.put('/:id', authenticate, updateBookingValidator, validateRequest, updateBooking);
 router.patch('/:id/cancel', authenticate, cancelBooking);
 router.delete('/:id', authenticate, deleteBooking);

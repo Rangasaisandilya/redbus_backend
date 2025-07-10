@@ -9,8 +9,6 @@ import { sendResponse } from '../utils/response';
  *   post:
  *     summary: Create a new booking
  *     tags: [Booking]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -26,8 +24,6 @@ import { sendResponse } from '../utils/response';
  *               $ref: '#/components/schemas/ApiResponse'
  *       400:
  *         description: Bad request
- *       401:
- *         description: Unauthorized
  */
 export const createBooking = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -114,8 +110,7 @@ export const getBookingById = async (req: Request, res: Response): Promise<void>
     try {
         const { id } = req.params;
         const booking = await Booking.findById(id)
-            .populate('passenger')
-            .populate('tripId');
+            .populate('passengers');
         
         if (!booking) {
             sendResponse(res, 404, {
@@ -177,6 +172,52 @@ export const getBookingsByTrip = async (req: Request, res: Response): Promise<vo
             status: false,
             message: 'Internal server error',
             errors: [{ msg: 'Failed to fetch bookings for trip', path: 'server' }]
+        });
+    }
+};
+
+/**
+ * @swagger
+ * /api/v1/booking/user/{userId}:
+ *   get:
+ *     summary: Get bookings by user ID
+ *     tags: [Booking]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: List of bookings for user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiResponse'
+ *       401:
+ *         description: Unauthorized
+ */
+export const getBookingsByUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { userId } = req.params;
+        const bookings = await Booking.find({ userId })
+            .sort({ bookedAt: -1 });
+        
+        sendResponse(res, 200, {
+            status: true,
+            data: bookings,
+            message: "SUCCESS",
+            count: bookings.length
+        });
+    } catch (error: any) {
+        sendResponse(res, 500, {
+            status: false,
+            message: 'Internal server error',
+            errors: [{ msg: 'Failed to fetch bookings for user', path: 'server' }]
         });
     }
 };
