@@ -7,6 +7,7 @@ import { limiterConfig } from "./config/rateLimitConfig";
 import { env } from "./config/envConfig";
 import connectDB from "./config/dbConfig";
 import errorHandler from "./middleware/errorHandler";
+import { setupSwagger } from "./config/swaggerConfig";
 // import { throttleConfig } from "./config/throttleConfig.cjs";
 
 const app: Application = express();
@@ -40,6 +41,9 @@ app.use(morgan("dev"));
 // ===== API Routes =====
 app.use(env.BASIC_API_URL, routes);
 
+// ===== Swagger Documentation =====
+setupSwagger(app);
+
 // Handle global error handler
 app.use(errorHandler)
 
@@ -48,7 +52,7 @@ connectDB();
 
 // ===== Health Check =====
 app.get("/", (req, res) => {
-  res.send("API is running");
+  res.send("API is running. Visit /api-docs for Swagger documentation");
 });
 
 export default app;
