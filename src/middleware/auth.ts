@@ -41,7 +41,7 @@ export const authenticate = async (
     }
 
     req.user = user;
-    req.body.userId= user._id
+    // req.body.userId= user._id
     next();
   } catch (err) {
     res.status(401).json({ message: "Invalid token", error: err });

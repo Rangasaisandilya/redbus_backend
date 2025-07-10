@@ -56,7 +56,7 @@ export const getAllBuses = async (req: Request, res: Response) => {
       status: true,
       message: "Bus Fetch successfully",
       data: buses,
-      total:total
+      count:total
     });
   } catch (err) {
     sendResponse(res, 500, {
