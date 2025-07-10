@@ -54,13 +54,13 @@ export const getAllUsers = async (
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const total = await User.countDocuments(query);
+    const count = await User.countDocuments(query);
 
     sendResponse(res, 200, {
       status: true,
       message: "Users fetched successfully",
       data: users,
-      total: total,
+      count: count,
     });
   } catch (error: any) {
     console.error("Error fetching users:", error);

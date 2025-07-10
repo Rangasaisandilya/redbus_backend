@@ -8,7 +8,9 @@ type ResponsePayload = {
   errors?: { [key: string]: string }[] | string[];
   token?: string;
   user?: any;
-  total?:any;
+  count?:any;
+  page?:any;
+  limit?:any;
 };
 
 export const sendResponse = (
@@ -23,6 +25,9 @@ export const sendResponse = (
     ...(payload.errors && { errors: payload.errors }),
     ...(payload.token && { token: payload.token }),
     ...(payload.user && { user: payload.user }),
-    ...(payload.total && { total: payload.total }),
+    ...(payload.count && { total: payload.count }),
+    ...(payload.page && { total: payload.page }),
+    ...(payload.limit && { total: payload.limit }),
+
   });
 };
