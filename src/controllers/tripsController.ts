@@ -162,6 +162,7 @@ export const searchTrips = catchAsync(async (req: Request, res: Response, next: 
     const from = (req.query.from as string)?.toLowerCase();
     const to = (req.query.to as string)?.toLowerCase();
     const date = req.query.date as string;
+    const { id } = req.params;
 
     //console.log(req.query)
 
@@ -182,27 +183,36 @@ export const searchTrips = catchAsync(async (req: Request, res: Response, next: 
     const endOfDay = new Date(date);
     endOfDay.setUTCHours(23, 59, 59, 999);
 
-    const trips = await Trips.find({
+    
+    let query :Record<any,any>={
         routeId: route._id,
         departureTime: { $gte: startOfDay, $lte: endOfDay },
         status: 'approved'
-    }).select('-_id -routeId -createdAt -updatedAt -createdBy').
-        populate({
+    };
+
+    if (id) {
+        query._id = id; 
+    }
+
+
+    const trips = await Trips.find(query)
+        .select('-routeId -createdAt -updatedAt -createdBy')
+        .populate({
             path: 'busId',
             populate: [
                 { path: 'owner', select: '-_id name email phone' },
                 { path: 'driver', select: '-_id name email phone' }
             ]
         }).populate({
-            path:'routeId',
-            populate:'distance estimatedDuration from to stops'
+            path: 'routeId',
+            populate: 'distance estimatedDuration from to stops'
         }).lean();
 
-        console.log(trips)
+        //console.log(trips)
 
         const formattedTrips = (trips as unknown as TripWithBus[]).map(trip => {
 
-        const { busId, arrivalTime,departureTime,routeId,...rest} = trip;
+        const { _id,busId, arrivalTime,departureTime,routeId,...rest} = trip;
 
         // Destructure and rename fields from busId
         const {
@@ -226,20 +236,22 @@ export const searchTrips = catchAsync(async (req: Request, res: Response, next: 
 
 
         return {
-            ...rest,
+            id:_id,
             arrivalTime: arrivalTime,
             departureTime:departureTime,
             bus,
-            route
+            route,
+            ...rest,
+           
         };
 
-        return {
-            ...rest,
-            arrivalTime: formatToISTString(arrivalTime),
-            departureTime: formatToISTString(departureTime),
-            bus,
-            route
-        };
+        // return {
+        //     ...rest,
+        //     arrivalTime: formatToISTString(arrivalTime),
+        //     departureTime: formatToISTString(departureTime),
+        //     bus,
+        //     route
+        // };
     });
 
 

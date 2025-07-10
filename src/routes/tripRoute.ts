@@ -17,5 +17,7 @@ router.post("/", authenticate, roleAuthentication(ADMIN, OWNER), tripValidator, 
 router.put("/:id", authenticate, roleAuthentication(ADMIN, OWNER), tripValidator, validateRequest, updateTrip)
 // get trip by source destionation and from date
 router.get("/search",searchTrips)
+// get the particular trip by id
+router.get("/:id",searchTrips)
 
 export default router
