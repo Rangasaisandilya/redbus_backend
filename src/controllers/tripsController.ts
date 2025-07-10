@@ -97,7 +97,7 @@ export const getAllTrips = catchAsync(async (req: Request, res: Response, next: 
 export const createNewTrip = catchAsync(async (req: UserRequest, res: Response, next: NextFunction) => {
     console.log("create new trip api started")
 
-    const { routeId, busId } = req.body
+    const { routeId, busId} = req.body
 
     if (!mongoose.Types.ObjectId.isValid(routeId) || !mongoose.Types.ObjectId.isValid(busId)) {
         throw new AppError(400, 'Invalid routeId or busId format')
